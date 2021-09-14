@@ -24,6 +24,8 @@ SELECT * FROM najszybsze;
 
 DROP TABLE najszybsze;
 
+/* ========================================================================= */
+
 CREATE TABLE najszybsze
 (
 	zwierze CHAR(20) NOT NULL DEFAULT 'nienazwane',
@@ -70,6 +72,8 @@ VALUES (173, 'Kobuz', 160);
 
 INSERT INTO unikaty_najszybsze(zwierze, max_predkosc) 
 VALUES ('Gepard', 160);
+
+/* ========================================================================= */
 
 USE sakila;
 DESC sakila;
@@ -169,6 +173,8 @@ SELECT * FROM customer LIMIT 40;
 UPDATE customer SET email = 'Lopez.A@yahoo.com' WHERE customer_id = 32;
 DELETE FROM customer WHERE customer_id = 33;
 
+/* ========================================================================= */
+
 CREATE TABLE fastest_file
 (
 	zwierze CHAR(30),
@@ -204,6 +210,46 @@ SET predkosc = REPLACE (@predkosc, ',', '.'),
 	klasa = IF(@klasa = '', NULL, @klasa);
     
 SELECT * FROM fastest_file2;
+
+/* ========================================================================= */
+
+SHOW databases;
+CREATE DATABASE ksiazki;
+SELECT database();
+CREATE TABLE ksiazki1 
+(
+	ksizka_id INT AUTO_INCREMENT PRIMARY KEY,
+	author CHAR(50),
+	title CHAR(150),
+	publication_year INT,
+	ISBN CHAR(13),
+    rating DEC(3,2),
+	ratings_no INT,
+	reviews_no INT,
+	1_star INT,
+	2_star INT,
+	3_star INT,
+	4_star INT,
+	5_star INT
+);
+USE ksiazki;
+DROP TABLE ksiazki1;
+SHOW TABLES;
+DESC ksiazki1;
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\ksiazki.csv'
+INTO TABLE ksiazki1
+CHARACTER SET utf8
+FIELDS TERMINATED BY ';'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES
+(author, title, publication_year, ISBN, @rating, ratings_no, reviews_no, 1_star, 2_star, 3_star, 4_star, 5_star)
+	SET rating = REPLACE(@rating, ',', '.'); 
+    
+SELECT * FROM ksiazki1;
+
+
+
 
 
 
