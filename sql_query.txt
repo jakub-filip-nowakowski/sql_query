@@ -1,0 +1,212 @@
+SHOW databases;
+USE najszybsze_zwierzeta;
+SHOW tables;
+DESC najwolniejsze_zwierzeta;
+CREATE TABLE najszybsze
+(
+	zwierze CHAR(20) NOT NULL,
+    max_predkosc INT,
+    stan CHAR(10)
+);
+   
+DESC najszybsze;
+
+INSERT INTO unikaty_najszybsze(zwierze_id, zwierze, max_predkosc, stan) 
+VALUES (1,'Sokol Wedrowny', 390, 'nurkowanie');
+
+INSERT INTO unikaty_najszybsze(zwierze_id, zwierze, max_predkosc) 
+VALUES (10, 'Orzel Zloty', 320);
+
+INSERT INTO najszybsze(max_predkosc, stan) 
+VALUES (170, 'lot');
+
+SELECT * FROM najszybsze;
+
+DROP TABLE najszybsze;
+
+CREATE TABLE najszybsze
+(
+	zwierze CHAR(20) NOT NULL DEFAULT 'nienazwane',
+    max_predkosc INT,
+    stan CHAR(10) NOT NULL DEFAULT 'niepodano'
+);
+
+DESC najszybsze;
+
+SELECT * FROM najszybsze;
+
+CREATE TABLE unikaty_najszybsze
+(
+	zwierze_id INT NOT NULL,
+    zwierze CHAR(20) DEFAULT 'nienazwane',
+    max_predkosc INT NOT NULL, 
+    stan CHAR (10) DEFAULT 'nie podano',
+PRIMARY KEY(zwierze_id)
+);
+
+DESC unikaty_najszybsze;
+SELECT * FROM unikaty_najszybsze;
+
+DROP TABLE unikaty_najszybsze;
+
+CREATE TABLE unikaty_najszybsze
+(
+	zwierze_id INT AUTO_INCREMENT PRIMARY KEY,
+    zwierze CHAR(20) DEFAULT 'nienazwane',
+    max_predkosc INT NOT NULL, 
+    stan CHAR (10) DEFAULT 'nie podano'
+);
+
+INSERT INTO unikaty_najszybsze(zwierze, max_predkosc, stan) 
+VALUES ('Sokol Wedrowny', 390, 'nurkowanie');
+
+INSERT INTO unikaty_najszybsze(zwierze, max_predkosc) 
+VALUES ('Orzel Zloty', 320);
+
+SELECT * FROM unikaty_najszybsze;
+
+INSERT INTO unikaty_najszybsze(zwierze_id, zwierze, max_predkosc) 
+VALUES (173, 'Kobuz', 160);
+
+INSERT INTO unikaty_najszybsze(zwierze, max_predkosc) 
+VALUES ('Gepard', 160);
+
+USE sakila;
+DESC sakila;
+SHOW TABLES;
+
+SELECT * FROM film;
+DESC film;
+
+SELECT title, release_year FROM film;
+
+SELECT title, length FROM film LIMIT 151;
+
+SELECT length, title FROM film LIMIT 150, 20;
+
+SELECT title, rating  FROM film WHERE rating = 'G';
+
+SELECT title, length FROM film WHERE length > 120;
+
+SELECT title, length FROM film WHERE length != 130;
+
+SELECT title, rating FROM film LIMIT 50;
+
+SELECT title FROM film LIMIT 980, 20;
+
+SELECT 
+	title AS 'Tytu³ filmu', 
+	release_year AS 'Rok wydania',
+	length AS 'D³ugoœæ filmu', 
+	rental_duration AS 'Czas wypo¿yczenia', 
+	rental_rate AS 'Koszt wypo¿yczenia', 
+	replacement_cost AS 'Koszt odkupu' 
+FROM film 
+LIMIT 20;
+
+
+SELECT database();
+
+DESC customer;
+SELECT 
+	first_name AS 'Imiê',
+    last_name AS 'Nazwisko',
+    email AS 'Adres email',
+    create_date AS 'Data rejestracji'
+FROM customer 
+LIMIT 99, 15;
+
+USE sakila;
+CREATE TABLE fastest
+(
+    animal CHAR(30),
+    max_speed INT,
+    class CHAR(20)
+);
+INSERT INTO fastest(animal, max_speed, class)
+VALUES
+    ("Peregrine falcon", 390, "Flight-diving"),
+    ("Golden eagle", 320, "Flight-diving"),
+    ("Whitethroated needletail swift", 170, "Flight");
+    
+SELECT * FROM fastest;
+
+SELECT * FROM customer LIMIT 10;
+UPDATE customer SET email = 'mary.smith@gmail.com' WHERE customer_id = 1;
+UPDATE customer SET last_name = "KONONOWICZ" WHERE customer_id = 7;
+
+SHOW databases;
+SHOW tables;
+USE sakila;
+
+SELECT database();
+USE najszybsze_zwierzeta;
+CREATE TABLE fastest
+(
+    animal CHAR(30),
+    max_speed INT,
+    class CHAR(20)
+);
+INSERT INTO fastest(animal, max_speed, class)
+VALUES
+    ("Peregrine falcon", 390, "Flight-diving"),
+    ("Golden eagle", 320, "Flight-diving"),
+    ("Whitethroated needletail swift", 170, "Flight"),
+    ('Eurasian hobby', 160, 'Flight'),
+    ('Mexican free-tailed bat', 160, 'Flight'),
+    ('Frigatebird', 153, 'Flight'),
+    ('Rock dove', 149, 'Flight'),
+    ('Spur-winged goose', 142, 'Flight'),
+    ('Black marlin', 129, 'Swimming'),
+    ('Gryfalcon', 128, 'Flight');
+
+SELECT * FROM fastest;
+DELETE FROM fastest WHERE animal = 'Rock dove';
+DELETE FROM fastest WHERE class = 'Flight-diving';
+
+USE sakila;
+SELECT * FROM customer LIMIT 40;
+UPDATE customer SET email = 'Lopez.A@yahoo.com' WHERE customer_id = 32;
+DELETE FROM customer WHERE customer_id = 33;
+
+CREATE TABLE fastest_file
+(
+	zwierze CHAR(30),
+    predkosc INT,
+    klasa CHAR(20)
+);
+
+SHOW VARIABLES LIKE 'secure_file_priv';
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\fastest_file.csv'
+INTO TABLE fastest_file
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\r\n';
+
+SELECT * FROM fastest_file;
+
+CREATE TABLE fastest_file2
+(
+	zwierze CHAR(30),
+    predkosc DEC(4,1),
+    klasa CHAR(20)
+);
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\fastest_utf8.csv'
+INTO TABLE fastest_file2
+CHARACTER SET utf8
+FIELDS TERMINATED BY ';'
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES
+(zwierze, @predkosc, @klasa)
+SET predkosc = REPLACE (@predkosc, ',', '.'),
+	klasa = IF(@klasa = '', NULL, @klasa);
+    
+SELECT * FROM fastest_file2;
+
+
+
+
+
+
