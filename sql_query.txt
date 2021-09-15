@@ -244,10 +244,71 @@ FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\r\n'
 IGNORE 1 LINES
 (author, title, publication_year, ISBN, @rating, ratings_no, reviews_no, 1_star, 2_star, 3_star, 4_star, 5_star)
-	SET rating = REPLACE(@rating, ',', '.'); 
-    
+SET rating = REPLACE(@rating, ',', '.'); 
 SELECT * FROM ksiazki1;
+/* ========================================================================== */
+SELECT author, title FROM ksiazki1
+INTO OUTFILE 'pliktest.csv'
+CHARACTER SET utf8
+FIELDS TERMINATED BY ';'
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n';
+/* ========================================================================== */
+SELECT title, publication_year FROM ksiazki1
+INTO OUTFILE 'C:\\pliktest2.csv'
+FIELDS TERMINATED BY ';'
+LINES TERMINATED BY '\r\n';
+/* ========================================================================== */
+SELECT concat(author,title) FROM ksiazki1 LIMIT 5;
+SELECT concat(author, '-', title, '-', publication_year) FROM ksiazki1 LIMIT 5;
+SELECT 
+	concat_ws(' - ', author, title, publication_year) AS 'author - tytu³ - rok wydania'
+FROM ksiazki1 
+LIMIT 5;
+/* ========================================================================== */
+SELECT substring('mam na imiê Jakub', 12,6);
+SELECT substring('mam na imiê Jakub', 12);
+SELECT substring('mam na imiê Jakub', -5);
 
+SELECT substring(title, 1, 12) FROM ksiazki1;
+
+SELECT concat
+(
+	substring(title, 1, 7),
+	'...'
+)
+FROM ksiazki1;
+
+SELECT concat
+(
+	substring(author, 1, 5),
+    '...',
+    ' - ',
+    substring(title, 1, 10),
+    '...'
+) 
+FROM ksiazki1;
+/* ========================================================================== */
+SELECT REPLACE('My SQL jest super!', 'super', 'ekstra');
+
+SELECT 
+substring(
+	REPLACE(title, 'e', '3'),
+    1, 10
+)
+FROM ksiazki1;
+
+SELECT 	
+REPLACE( 
+	REPLACE(
+		REPLACE(
+			REPLACE(
+				REPLACE(title,	'e', '3'),
+								'a', '4'),
+								't', '7'),
+								'b', '8'),
+								's', '5')
+FROM ksiazki1 LIMIT 15;
 
 
 
