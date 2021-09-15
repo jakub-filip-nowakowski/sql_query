@@ -309,7 +309,31 @@ REPLACE(
 								'b', '8'),
 								's', '5')
 FROM ksiazki1 LIMIT 15;
+/* ================================================================================= */
+USE ksiazki;
+SELECT REVERSE(author) FROM ksiazki1;
 
+SELECT char_length('Jakub Nowakowski z Sosnowca');
+SELECT title, CHAR_LENGTH(title) AS 'D³ugoœæ tytu³u' FROM ksiazki1;
+SELECT UPPER('jakub nowakowski');
+SELECT LOWER('JAKUB NOWAKOWSKI');
+
+SELECT author FROM ksiazki1;
+SELECT 
+	SUBSTRING_INDEX(author, ' ', 1) AS first_name,
+    SUBSTRING_INDEX(author, ' ', -1) AS last_name
+FROM ksiazki1;
+
+SELECT DISTINCT publication_year FROM ksiazki1;
+/*==========================================================*/
+SELECT 
+DISTINCT LOWER(
+		SUBSTRING_INDEX(author, ' ', 1)
+	)
+AS imiê,
+CHAR_LENGTH(SUBSTRING_INDEX(author, ' ', 1)) AS 'D³ugoœæ imienia'
+FROM ksiazki1;
+ 
 
 
 
