@@ -333,9 +333,78 @@ DISTINCT LOWER(
 AS imiê,
 CHAR_LENGTH(SUBSTRING_INDEX(author, ' ', 1)) AS 'D³ugoœæ imienia'
 FROM ksiazki1;
+/*=========================================================== */
+SELECT 
+	title AS tytu³,
+    rating
+FROM ksiazki1
+ORDER BY rating DESC
+LIMIT 10;
+
+SELECT 
+	author AS autor,
+    title AS tytu³,
+    publication_year AS 'rok wydania',
+    isbn
+FROM ksiazki1
+ORDER BY 4 DESC
+LIMIT 10;
+
+DESC ksiazki1;
+
+SELECT 
+	title AS tytu³,
+    SUBSTRING_INDEX(author, ' ', -1) AS nazwisko,
+    ratings_no AS 'iloœæ ocen'
+FROM ksiazki1
+ORDER BY 3 DESC
+LIMIT 15;
  
+SELECT * FROM ksiazki1 WHERE author LIKE 'Jo%';
+SELECT * FROM ksiazki1 WHERE author LIKE '%Tolkien';
+SELECT * FROM ksiazki1 WHERE author LIKE '%Tolk%';
 
+SELECT SUBSTRING_INDEX(author, ' ', 1) FROM ksiazki1 
+WHERE SUBSTRING_INDEX(author, ' ', 1) 
+LIKE '____';
 
+SELECT * FROM ksiazki1 WHERE title LIKE '%/%%';
+
+SELECT title FROM ksiazki1 WHERE title LIKE '%the%';
+
+SELECT SUBSTRING_INDEX(author, ' ', -1) FROM ksiazki1 
+WHERE CHAR_LENGTH(SUBSTRING_INDEX(author, ' ', -1)) = 6;
+
+/*=========================================================== */
+USE ksiazki;
+SELECT COUNT(*) FROM ksiazki1;
+SELECT COUNT(DISTINCT author) FROM ksiazki1;
+SELECT COUNT(*) FROM ksiazki1 WHERE title LIKE '%the%';
+SELECT 
+	COUNT(DISTINCT SUBSTRING_INDEX(author, ' ', -1)) 
+    FROM ksiazki1 
+    WHERE CHAR_LENGTH(SUBSTRING_INDEX(author, ' ', -1)) = 6;
+
+SELECT COUNT(*)
+FROM ksiazki1
+WHERE publication_year = 2012;
+
+SELECT COUNT(*)
+FROM ksiazki1
+WHERE SUBSTRING_INDEX(author, ' ', 1) = 'John';
+
+SELECT 
+	author,
+    COUNT(*) AS 'ile ksiazek'
+FROM ksiazki1
+GROUP BY author;
+
+SELECT 
+	publication_year,
+    COUNT(*) AS 'ksiazki w danym roku'
+FROM ksiazki1
+GROUP BY publication_year
+ORDER BY 2 DESC;
 
 
 
