@@ -614,4 +614,92 @@ WHERE ratings_no != 1_star + 2_star + 3_star + 4_star + 5_star;
 UPDATE ksiazki1
 SET ratings_no = (1_star + 2_star + 3_star + 4_star + 5_star) 
 WHERE ratings_no != (1_star + 2_star + 3_star + 4_star + 5_star);
-/* ============================= **************   ==============================*/
+/* ========================= TRANSFORMACJA I ZAWIERANIE SIÊ   ==============================*/
+SELECT CAST('2010-05-01' AS DATE);
+SELECT CAST(10 AS CHAR);
+
+SELECT 
+	SUBSTRING_INDEX(author, ' ', 1) AS "first_name",
+	SUBSTRING_INDEX(author, ' ', -1) AS "last_name",
+    title,
+    publication_year
+FROM ksiazki1
+WHERE SUBSTRING_INDEX(author, ' ', -1) IN ("tolkien", "rowling", "king");
+
+/* Podaj œredni¹ ocenê ksi¹¿ek ka¿dego autora który ma na imiê John, Dan, George lub William, 
+uwzglêdnij tylko ksi¹¿ki publikowane w latach nieparzystych.  */
+
+SELECT author, AVG(rating)
+FROM ksiazki1
+WHERE SUBSTRING_INDEX(author, ' ', 1) IN ('John', 'Dan', 'George', 'William') AND
+publication_year % 2 = 0
+GROUP BY author;
+
+SELECT title, rating,
+	CASE
+		WHEN rating > 4 THEN 'To jest dobra ksiazka'
+        ELSE 'To jest przecietna ksiazka'
+	END AS rodzaj
+FROM ksiazki1;
+
+SELECT title, rating,
+	CASE
+		WHEN rating > 4.2 THEN 'Doskonala ksiazka'
+        WHEN rating BETWEEN 3.8 AND 4.2 THEN 'Dobra ksizka'
+        ELSE 'Przecietna ksiazka'
+	END AS rodzaj,
+    author
+FROM ksiazki1;
+
+SELECT 
+	title, 
+    rating,
+    IF(rating > 4, 'dobra ksiazka', 'przecietna ksiazka') AS rodzaj,
+    author
+FROM ksiazki1;
+
+/* ================================================================================= */
+/*Zastosuj formatowanie warunkowe aby przypisaæ liczbê gwiazdek 
+ksi¹¿ce wed³ug jej oceny. Zastosuj nastêpuj¹ce kryteria:
+
+***** dla oceny > 4.5
+****’ dla oceny > 4.0 oraz <= 4.5
+**** dla oceny > 3.5 oraz <= 4.0
+***’ dla oceny > 3.0 oraz <= 3.5
+*** dla oceny > 2.5 oraz <= 3.0
+**’ dla oceny > 2.0 oraz < 2.5
+* dla pozosta³ych przypadków */
+
+SELECT 
+	author, 
+    title, 
+    rating,
+		CASE
+			WHEN rating > 4.5 THEN '*****'
+			WHEN rating > 4.0 AND rating <= 4.5 THEN '****\''
+			WHEN rating > 3.5 AND rating <= 4.0 THEN '****'
+			WHEN rating > 3.0 AND rating <= 3.5 THEN '***\''
+			WHEN rating > 2.5 AND rating <= 3.0 THEN '***'
+			WHEN rating > 2.0 AND rating <= 2.5 THEN '**\''
+			else '*'
+		END AS 'ilosc_gwiazdek',
+    publication_year,
+		CASE 
+			WHEN publication_year > 1939 THEN "literatura wspolczesna"
+			WHEN publication_year > 1918 AND publication_year <= 1939 THEN "literatura miedzywojenna"
+			WHEN publication_year > 1880 AND publication_year <= 1918 THEN "modernizm"
+			WHEN publication_year > 1850 AND publication_year <= 1880 THEN "pozytywizm"
+			WHEN publication_year > 1789 AND publication_year <= 1850 THEN "romantyzm"
+			WHEN publication_year > 1680 AND publication_year <= 1789 THEN "oswiecenie"
+			WHEN publication_year > 1520 AND publication_year <= 1680 THEN "barok"
+			WHEN publication_year > 1492 AND publication_year <= 1520 THEN "renesans"
+			WHEN publication_year < 1520 THEN "sredniowiecze"
+		END AS "epoka_literatury",
+	IF (1_star + 2_star + 3_star + 4_star > 5_star, 
+		'zazwyczaj mniej niz 5 gwiazek',
+        'zazwyczaj wiecej niz 4 gwiazdki'
+	) AS 'trend gwiazdek'
+FROM ksiazki1
+GROUP BY title;
+
+    
