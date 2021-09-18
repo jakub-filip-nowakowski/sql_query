@@ -8,9 +8,7 @@ CREATE TABLE najszybsze
     max_predkosc INT,
     stan CHAR(10)
 );
-   
 DESC najszybsze;
-
 INSERT INTO unikaty_najszybsze(zwierze_id, zwierze, max_predkosc, stan) 
 VALUES (1,'Sokol Wedrowny', 390, 'nurkowanie');
 
@@ -21,22 +19,16 @@ INSERT INTO najszybsze(max_predkosc, stan)
 VALUES (170, 'lot');
 
 SELECT * FROM najszybsze;
-
 DROP TABLE najszybsze;
-
-/* ========================================================================= */
-
+/* =============================================================================== */
 CREATE TABLE najszybsze
 (
 	zwierze CHAR(20) NOT NULL DEFAULT 'nienazwane',
     max_predkosc INT,
     stan CHAR(10) NOT NULL DEFAULT 'niepodano'
 );
-
 DESC najszybsze;
-
 SELECT * FROM najszybsze;
-
 CREATE TABLE unikaty_najszybsze
 (
 	zwierze_id INT NOT NULL,
@@ -45,12 +37,9 @@ CREATE TABLE unikaty_najszybsze
     stan CHAR (10) DEFAULT 'nie podano',
 PRIMARY KEY(zwierze_id)
 );
-
 DESC unikaty_najszybsze;
 SELECT * FROM unikaty_najszybsze;
-
 DROP TABLE unikaty_najszybsze;
-
 CREATE TABLE unikaty_najszybsze
 (
 	zwierze_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -72,32 +61,20 @@ VALUES (173, 'Kobuz', 160);
 
 INSERT INTO unikaty_najszybsze(zwierze, max_predkosc) 
 VALUES ('Gepard', 160);
-
 /* ========================================================================= */
-
 USE sakila;
 DESC sakila;
 SHOW TABLES;
-
 SELECT * FROM film;
 DESC film;
-
 SELECT title, release_year FROM film;
-
 SELECT title, length FROM film LIMIT 151;
-
 SELECT length, title FROM film LIMIT 150, 20;
-
 SELECT title, rating  FROM film WHERE rating = 'G';
-
 SELECT title, length FROM film WHERE length > 120;
-
 SELECT title, length FROM film WHERE length != 130;
-
 SELECT title, rating FROM film LIMIT 50;
-
 SELECT title FROM film LIMIT 980, 20;
-
 SELECT 
 	title AS 'Tytu³ filmu', 
 	release_year AS 'Rok wydania',
@@ -172,9 +149,7 @@ USE sakila;
 SELECT * FROM customer LIMIT 40;
 UPDATE customer SET email = 'Lopez.A@yahoo.com' WHERE customer_id = 32;
 DELETE FROM customer WHERE customer_id = 33;
-
-/* ========================================================================= */
-
+/* =============================================================================== */
 CREATE TABLE fastest_file
 (
 	zwierze CHAR(30),
@@ -208,11 +183,8 @@ IGNORE 1 LINES
 (zwierze, @predkosc, @klasa)
 SET predkosc = REPLACE (@predkosc, ',', '.'),
 	klasa = IF(@klasa = '', NULL, @klasa);
-    
 SELECT * FROM fastest_file2;
-
-/* ========================================================================= */
-
+/* =============================================================================== */
 SHOW databases;
 CREATE DATABASE ksiazki;
 SELECT database();
@@ -246,26 +218,26 @@ IGNORE 1 LINES
 (author, title, publication_year, ISBN, @rating, ratings_no, reviews_no, 1_star, 2_star, 3_star, 4_star, 5_star)
 SET rating = REPLACE(@rating, ',', '.'); 
 SELECT * FROM ksiazki1;
-/* ========================================================================== */
+/* =============================================================================== */
 SELECT author, title FROM ksiazki1
 INTO OUTFILE 'pliktest.csv'
 CHARACTER SET utf8
 FIELDS TERMINATED BY ';'
 ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n';
-/* ========================================================================== */
+/* =============================================================================== */
 SELECT title, publication_year FROM ksiazki1
 INTO OUTFILE 'C:\\pliktest2.csv'
 FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\r\n';
-/* ========================================================================== */
+/* =============================================================================== */
 SELECT concat(author,title) FROM ksiazki1 LIMIT 5;
 SELECT concat(author, '-', title, '-', publication_year) FROM ksiazki1 LIMIT 5;
 SELECT 
 	concat_ws(' - ', author, title, publication_year) AS 'author - tytu³ - rok wydania'
 FROM ksiazki1 
 LIMIT 5;
-/* ========================================================================== */
+/* =============================================================================== */
 SELECT substring('mam na imiê Jakub', 12,6);
 SELECT substring('mam na imiê Jakub', 12);
 SELECT substring('mam na imiê Jakub', -5);
@@ -288,7 +260,7 @@ SELECT concat
     '...'
 ) 
 FROM ksiazki1;
-/* ========================================================================== */
+/* ============================================================================== */
 SELECT REPLACE('My SQL jest super!', 'super', 'ekstra');
 
 SELECT 
@@ -309,7 +281,7 @@ REPLACE(
 								'b', '8'),
 								's', '5')
 FROM ksiazki1 LIMIT 15;
-/* ================================================================================= */
+/* =============================================================================== */
 USE ksiazki;
 SELECT REVERSE(author) FROM ksiazki1;
 
@@ -325,7 +297,7 @@ SELECT
 FROM ksiazki1;
 
 SELECT DISTINCT publication_year FROM ksiazki1;
-/*==========================================================*/
+/*=================================================================================*/
 SELECT 
 DISTINCT LOWER(
 		SUBSTRING_INDEX(author, ' ', 1)
@@ -333,7 +305,7 @@ DISTINCT LOWER(
 AS imiê,
 CHAR_LENGTH(SUBSTRING_INDEX(author, ' ', 1)) AS 'D³ugoœæ imienia'
 FROM ksiazki1;
-/*=========================================================== */
+/*================================================================================ */
 SELECT 
 	title AS tytu³,
     rating
@@ -374,8 +346,7 @@ SELECT title FROM ksiazki1 WHERE title LIKE '%the%';
 
 SELECT SUBSTRING_INDEX(author, ' ', -1) FROM ksiazki1 
 WHERE CHAR_LENGTH(SUBSTRING_INDEX(author, ' ', -1)) = 6;
-
-/*=========================================================== */
+/*================================================================================ */
 USE ksiazki;
 SELECT COUNT(*) FROM ksiazki1;
 SELECT COUNT(DISTINCT author) FROM ksiazki1;
@@ -405,8 +376,59 @@ SELECT
 FROM ksiazki1
 GROUP BY publication_year
 ORDER BY 2 DESC;
+/* ========================================================================= */
+USE ksiazki;
+SELECT MIN(rating) FROM ksiazki1;
+SELECT rating FROM ksiazki1 ORDER BY rating LIMIT 1;
+SELECT MAX(rating) FROM ksiazki1;
 
+SELECT author, title, rating 
+FROM ksiazki1 ORDER BY rating LIMIT 1; 
 
+SELECT author, title, rating 
+FROM ksiazki1 
+WHERE rating = (SELECT MIN(rating) FROM ksiazki1);
 
+SELECT SUM(ratings_no) FROM ksiazki1;
+SELECT 
+	author, 
+    SUM(ratings_no), 
+    COUNT(*) 
+FROM ksiazki1 
+GROUP BY author 
+ORDER BY SUM(ratings_no) DESC;
 
+SELECT AVG(ratings_no) FROM ksiazki1;
+SELECT 
+	publication_year, 
+    AVG(rating) 
+FROM ksiazki1 
+GROUP BY publication_year 
+ORDER BY publication_year DESC;
 
+SELECT ROUND(4.202137, 2);
+
+SELECT 
+	publication_year, 
+    ROUND(AVG(rating), 2) 
+FROM ksiazki1 
+GROUP BY publication_year 
+ORDER BY publication_year DESC;
+
+SELECT 13 % 2;
+SELECT 13 % 5;
+SELECT 13 % 7;
+
+SELECT 
+	author, MIN(publication_year)
+FROM ksiazki1
+GROUP BY author;
+
+SELECT * FROM ksiazki1 LIMIT 5;
+
+SELECT 
+	author, SUM(reviews_no) AS komentarzy
+FROM ksiazki1
+GROUP BY author 
+ORDER BY komentarzy DESC
+LIMIT 10;
