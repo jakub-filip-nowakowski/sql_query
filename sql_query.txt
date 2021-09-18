@@ -432,3 +432,186 @@ FROM ksiazki1
 GROUP BY author 
 ORDER BY komentarzy DESC
 LIMIT 10;
+
+USE ksiazki;
+SELECT * FROM ksiazki1 LIMIT 5;
+
+SELECT 
+	author, 
+	ROUND(AVG(1_star), 0),
+	ROUND(AVG(5_star), 0)
+FROM ksiazki1
+GROUP BY author
+ORDER BY SUBSTRING_INDEX(author, ' ', -1);
+/* =============================    DATE    ===========================================*/
+SELECT CURDATE();
+SELECT CURTIME();
+SELECT NOW();
+SELECT DAY(NOW());
+SELECT DAY ('2017-0-19');
+SELECT DAYNAME(NOW());
+SELECT DAYOFWEEK(NOW());
+SELECT DAYOFYEAR(NOW());
+SELECT MONTH(NOW());
+SELECT MONTHNAME(NOW());
+SELECT HOUR(NOW());
+SELECT MINUTE(NOW());
+SELECT SECOND(NOW());
+
+SELECT DATE_FORMAT('2021-09-18 21:37:13', '%d/%m/%y');
+SELECT DATE_FORMAT('2021-09-18 21:37:13', '%M/%D/%Y , %H:%i');
+
+SELECT DATEDIFF(NOW(), '2010-01-01');
+SELECT DATE_ADD(NOW(), INTERVAL 100 DAY);
+SELECT DATE_ADD(NOW(), INTERVAL 21 YEAR);
+SELECT DATE_ADD(NOW(), INTERVAL 100 MINUTE);
+
+SELECT DATE_SUB(NOW(), INTERVAL 100 DAY);
+SELECT DATE_SUB(NOW(), INTERVAL 21 YEAR);
+SELECT DATE_SUB(NOW(), INTERVAL 100 MINUTE);
+
+SELECT TIMESTAMP('2010-05-01');
+CREATE TABLE komentarze
+(
+	tresc VARCHAR(250),
+    data_wpisu TIMESTAMP DEFAULT NOW()
+);
+INSERT INTO komentarze(tresc) VALUES ('ta ksiazka jest super');
+INSERT INTO komentarze(tresc) VALUES ('podoba³o mi siê!');
+
+UPDATE komentarze SET tresc = 'no mo¿e nie za bardzo fajna' 
+WHERE tresc = 'ta ksiazka jest super';
+
+SELECT * FROM komentarze;
+
+CREATE TABLE komentarze2
+(
+	tresc VARCHAR(250),
+    data_wpisu TIMESTAMP DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP
+);
+INSERT INTO komentarze2(tresc) VALUES ('ta ksiazka jest super');
+INSERT INTO komentarze2(tresc) VALUES ('podoba³o mi siê!');
+
+UPDATE komentarze2 SET tresc = 'no mo¿e nie za bardzo fajna' 
+WHERE tresc = 'ta ksiazka jest super';
+SELECT * FROM komentarze2;
+/* ============================= OPERATORY LOGICZNE==============================*/
+SELECT 5 = 5;
+SELECT 5 != 5;
+SELECT 6 = 5;
+SELECT 6 != 5;
+
+SELECT 8 > 5;
+SELECT 8 < 5;
+SELECT 8 >= 5;
+SELECT 8 <= 5;
+
+SELECT title, publication_year FROM ksiazki1 WHERE publication_year >= 2000;
+SELECT title, publication_year FROM ksiazki1 WHERE publication_year != 2000;
+
+SELECT
+	title, publication_year, rating
+FROM ksiazki1
+WHERE publication_year > 2010 AND rating > 4.0;
+
+SELECT
+	title, publication_year, rating
+FROM ksiazki1
+WHERE publication_year > 2010 OR rating > 4.0;
+
+SELECT title, publication_year
+FROM ksiazki1
+WHERE 
+	publication_year < 2010 AND
+	publication_year > 2000;
+    
+SELECT title, publication_year
+FROM ksiazki1
+WHERE 
+	publication_year BETWEEN 2000 AND 2010;
+    
+SELECT title, publication_year
+FROM ksiazki1
+WHERE 
+	publication_year NOT BETWEEN 2000 AND 2010;
+
+SELECT title, publication_year
+FROM ksiazki1
+WHERE publication_year BETWEEN 2005 AND 2010;
+
+SELECT publication_year, AVG(rating)
+FROM ksiazki1
+WHERE publication_year BETWEEN 1990 AND 2005
+GROUP BY publication_year						 	/* lub 1 */
+ORDER BY publication_year ASC; 						/* lub 1 */
+
+SELECT * FROM ksiazki1 LIMIT 5;
+
+SELECT author, SUM(1_star)
+FROM ksiazki1
+WHERE 
+	ratings_no >= 1000000 OR 
+    reviews_no >= 50000
+GROUP BY 1;
+
+SELECT 10 / 5;
+/* Jaki procent wœród ksi¹¿ek o ocenie co najmniej 4, stanowi¹ oceny piêciogwiazdkowe? */ 
+SELECT 
+    sum(5_star) / sum(ratings_no) * 100 AS procent 
+FROM ksiazki1 
+WHERE rating > 4;
+
+/* Jaka jest œrednia ocena dla autorów których nazwiska s¹ krótsze ni¿ 6 albo d³u¿sze ni¿ 10 znaków? */
+SELECT AVG(rating)
+FROM ksiazki1
+WHERE 	CHAR_LENGTH(SUBSTRING_INDEX(author, ' ', -1)) < 6 OR 
+		CHAR_LENGTH(SUBSTRING_INDEX(author, ' ', -1)) > 10;
+
+SELECT 
+    AVG(rating) 
+FROM ksiazki1
+WHERE char_length(SUBSTRING_INDEX(author, ' ', -1)) NOT BETWEEN 6 AND 10;
+
+
+
+
+
+
+
+/* Dla ka¿dego autora, dla ka¿dego roku w którym opublikowa³ ksi¹¿kê (lub ksi¹¿ki) policz sumê komentarzy do tych pozycji, 
+uwzglêdnij tylko pozycje, które mia³y co najmniej 600 tys. g³osów, listê podaj posortowan¹ od Z do A. 
+
+[PodpowiedŸ: nale¿y zastosowaæ podwójne grupowanie - nie omawialiœmy tego tematu ale rozwi¹zanie jest prostsze ni¿ Ci siê wydaje – tylko pamiêtaj o kolejnoœci!] */
+SELECT * FROM ksiazki1 LIMIT 5 ;
+
+SELECT author, publication_year, SUM(reviews_no)
+FROM ksiazki1
+WHERE ratings_no > 600000
+GROUP BY author, publication_year
+ORDER BY author ASC;
+/* Podaj listê autorów i tytu³ów ksi¹¿ek wydanych w latach parzystych. */
+SELECT author, title, publication_year
+FROM ksiazki1
+WHERE publication_year % 2 = 0;
+
+
+/* Bêdê z Tob¹ szczery… sporz¹dzaj¹c bazê ocen i liczby g³osów na 1 do 5 gwiazdek œwiadomie wprowadzi³em do bazy kilka b³êdów. 
+Dla paru ksi¹¿ek suma oddanych na nie g³osów oraz suma g³osów na poszczególn¹ liczbê gwiazdek siê nie zgadza. W tym æwiczeniu chcia³bym uzyskaæ dwie rzeczy:
+
+po pierwsze zidentyfikuj tytu³y ksi¹¿ek o których jest mowa,
+
+po drugie, napisz formu³ê, która sprawdzi powy¿szy warunek i dla ka¿dej pozycji, dla której suma g³osów (ratings_no) jest inna ni¿ suma g³osów na poszczególn¹ iloœæ gwiazdek, 
+zaktualizuje ten atrybut do liczby bêd¹cej prawid³ow¹ sum¹. */
+
+SELECT 
+	author, 
+	title, 
+    ratings_no, 
+    1_star + 2_star + 3_star + 4_star + 5_star AS 'suma gwiazdek'
+FROM ksiazki1
+WHERE ratings_no != 1_star + 2_star + 3_star + 4_star + 5_star;
+
+UPDATE ksiazki1
+SET ratings_no = (1_star + 2_star + 3_star + 4_star + 5_star) 
+WHERE ratings_no != (1_star + 2_star + 3_star + 4_star + 5_star);
+/* ============================= **************   ==============================*/
