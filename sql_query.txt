@@ -701,5 +701,30 @@ SELECT
 	) AS 'trend gwiazdek'
 FROM ksiazki1
 GROUP BY title;
+/* ====================================================================================== */
+
+SHOW databases;
+USE ksiazki;
+CREATE TABLE uzytkownicy
+(
+	user_id INT AUTO_INCREMENT PRIMARY KEY,
+    imie VARCHAR(20) NOT NULL,
+    nazwisko VARCHAR(50) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    adres_ulica VARCHAR(255) NOT NULL,
+    adres_miasto VARCHAR(255) NOT NULL,
+    adres_kod VARCHAR(6) NOT NULL,
+    telefon INT(9) NOT NULL,
+    data_rejestracji TIMESTAMP DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP
+);
+
+LOAD DATA INFILE 
+'C:\\Users\\Jakub\\Desktop\\uzytkownicy.csv'
+INTO TABLE uzytkownicy
+CHARACTER SET utf8
+FIELDS TERMINATED BY ';'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES
+(imie, nazwisko, email, adres_ulica, adres_miasto, adres_kod, telefon);
 
     
