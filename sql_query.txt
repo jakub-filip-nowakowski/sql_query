@@ -188,9 +188,9 @@ SELECT * FROM fastest_file2;
 SHOW databases;
 CREATE DATABASE ksiazki;
 SELECT database();
-CREATE TABLE ksiazki1 
+CREATE TABLE ksiazki 
 (
-	ksizka_id INT AUTO_INCREMENT PRIMARY KEY,
+	ksiazka_id INT AUTO_INCREMENT PRIMARY KEY,
 	author CHAR(50),
 	title CHAR(150),
 	publication_year INT,
@@ -210,7 +210,7 @@ SHOW TABLES;
 DESC ksiazki1;
 
 LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\ksiazki.csv'
-INTO TABLE ksiazki1
+INTO TABLE ksiazki
 CHARACTER SET utf8
 FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\r\n'
@@ -702,9 +702,10 @@ SELECT
 FROM ksiazki1
 GROUP BY title;
 /* ====================================================================================== */
-
+CREATE DATABASE ksiazki;
 SHOW databases;
 USE ksiazki;
+SHOW TABLES;
 CREATE TABLE uzytkownicy
 (
 	user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -718,8 +719,10 @@ CREATE TABLE uzytkownicy
     data_rejestracji TIMESTAMP DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP
 );
 
+SHOW VARIABLES LIKE 'secure_file_priv';
+
 LOAD DATA INFILE 
-'C:\\Users\\Jakub\\Desktop\\uzytkownicy.csv'
+'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\uzytkownicy.csv'
 INTO TABLE uzytkownicy
 CHARACTER SET utf8
 FIELDS TERMINATED BY ';'
@@ -727,4 +730,69 @@ LINES TERMINATED BY '\r\n'
 IGNORE 1 LINES
 (imie, nazwisko, email, adres_ulica, adres_miasto, adres_kod, telefon);
 
+SELECT * FROM uzytkownicy;
+SHOW TABLES;
+DESC ksiazki1;
+DESC uzytkownicy;
+
+CREATE TABLE zamowienia
+(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    uzytkownicy_id INT,
+    data_zamowienia TIMESTAMP DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (uzytkownicy_id) REFERENCES uzytkownicy(user_id)
+);
+
+CREATE TABLE koszyk
+(
+	zamowienia_id INT, 
+    ksiazki_id INT, 
+    FOREIGN KEY (zamowienia_id) REFERENCES zamowienia(id),
+    FOREIGN KEY (ksiazki_id) REFERENCES ksiazki(ksiazka_id)
+);
+
+DROP TABLE zamowienia; 
+DROP TABLE koszyk;
+
+LOAD DATA INFILE 
+'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\zamowienia.csv'
+INTO TABLE zamowienia
+CHARACTER SET utf8
+FIELDS TERMINATED BY ';'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES
+(id, uzytkownicy_id);
+
+LOAD DATA INFILE 
+'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\koszyk.csv'
+INTO TABLE koszyk
+CHARACTER SET utf8
+FIELDS TERMINATED BY ';'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES
+(zamowienia_id, ksiazki_id);
+
+SELECT * FROM koszyk;
+SELECT * FROM zamowienia;
+SELECT * FROM uzytkownicy;
+SELECT * FROM ksiazki;
+
+SELECT * FROM zamowienia, uzytkownicy WHERE uzytkownicy_id = uzytkownicy.user_id;
+SELECT * FROM zamowienia, koszyk WHERE zamowienia_id = zamowienia.id 
+AND uzytkownicy_id = 1;
+
+/* Przy pomocy jednego zapytania wypisz numery zamówieñ i iloœæ ksi¹¿ek
+ jakie zosta³y w ramach ka¿dego zamówienia kupione. */
+ 
+ SELECT zamowienia.id, COUNT(koszyk.ksiazki_id) AS 'ilosc ksiazek'  
+ FROM zamowienia, koszyk
+ WHERE id = koszyk.zamowienia_id
+ GROUP BY zamowienia.id;
+ 
+ SELECT
+    zamowienia_id,
+    COUNT(*) AS ile_ksiazek
+FROM koszyk, ksiazki
+WHERE ksiazki_id = ksiazki.ksiazka_id
+GROUP BY zamowienia_id;
     
