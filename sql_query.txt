@@ -572,12 +572,6 @@ SELECT
 FROM ksiazki1
 WHERE char_length(SUBSTRING_INDEX(author, ' ', -1)) NOT BETWEEN 6 AND 10;
 
-
-
-
-
-
-
 /* Dla ka¿dego autora, dla ka¿dego roku w którym opublikowa³ ksi¹¿kê (lub ksi¹¿ki) policz sumê komentarzy do tych pozycji, 
 uwzglêdnij tylko pozycje, które mia³y co najmniej 600 tys. g³osów, listê podaj posortowan¹ od Z do A. 
 
@@ -795,4 +789,153 @@ AND uzytkownicy_id = 1;
 FROM koszyk, ksiazki
 WHERE ksiazki_id = ksiazki.ksiazka_id
 GROUP BY zamowienia_id;
+
+USE ksiazki;
     
+CREATE TABLE autor
+(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    imie CHAR(20),
+    nazwisko CHAR(20)
+);
+
+CREATE TABLE ksiazka
+(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tytul CHAR(20),
+    rok_wydania INT(4),
+    autor_id INT,
+    FOREIGN KEY(autor_id) REFERENCES autor(id)
+);
+
+INSERT INTO autor(imie, nazwisko)
+VALUES
+    ("George", "Orwell"),
+    ("Bram", "Stoker"),
+    ("Frank", "Herbert"),
+    ("Stephen", "King") ,
+    ("Charles", "Dickens");
+    
+INSERT INTO ksiazka(tytul, rok_wydania, autor_id)
+VALUES
+    ("Animal Farm", 1945, 1),
+    ("Dune", 1965, 3),
+    ("Dracula", 1897, 2),
+    ("The Stand", 1990, 4),
+    ("1984", 1949, 1),
+    ("The Shining", 1977, 4);
+    
+SELECT * FROM autor;
+SELECT * FROM ksiazka;
+
+/* ============================= JOINS ================================= */
+
+USE ksiazki;
+
+SELECT * FROM autor LEFT JOIN ksiazka ON autor.id = ksiazka.autor_id;
+SELECT * FROM autor RIGHT JOIN ksiazka ON autor.id = ksiazka.autor_id;
+
+SELECT * FROM autor LEFT JOIN ksiazka ON autor.id = ksiazka.autor_id
+WHERE ksiazka.autor_id IS NULL; /* exclusive left join */
+
+SELECT * FROM autor RIGHT JOIN ksiazka ON autor.id = ksiazka.autor_id
+WHERE autor.id IS NULL; /* exclusive right join */
+
+SELECT * FROM autor INNER JOIN ksiazka ON autor.id = ksiazka.autor_id;
+/* mozna napisac zwyczajnie join bo domyslny typ to INNER */
+
+SELECT * FROM autor, ksiazka;
+SELECT * FROM autor CROSS JOIN ksiazka;
+/* to jest to samo, przemnozenie rekordow przez siebie */
+
+SELECT * FROM autor LEFT JOIN ksiazka ON autor.id = ksiazka.autor_id
+UNION
+SELECT * FROM autor RIGHT JOIN ksiazka ON autor.id = ksiazka.autor_id
+WHERE autor.id IS NULL;
+
+/* USUWANIE WPISÓW Z TABEL Z REFERENCJ¥ */
+
+DROP TABLE ksiazka;
+DROP TABLE autor;
+
+CREATE TABLE autor
+(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    imie CHAR(20),
+    nazwisko CHAR(20)
+);
+
+CREATE TABLE ksiazka
+(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tytul CHAR(20),
+    rok_wydania INT(4),
+    autor_id INT,
+    FOREIGN KEY(autor_id) 
+		REFERENCES autor(id)
+        ON DELETE CASCADE
+);
+
+INSERT INTO autor(imie, nazwisko)
+VALUES
+    ("George", "Orwell"),
+    ("Bram", "Stoker"),
+    ("Frank", "Herbert"),
+    ("Stephen", "King") ,
+    ("Charles", "Dickens");
+    
+INSERT INTO ksiazka(tytul, rok_wydania, autor_id)
+VALUES
+    ("Animal Farm", 1945, 1),
+    ("Dune", 1965, 3),
+    ("Dracula", 1897, 2),
+    ("The Stand", 1990, 4),
+    ("1984", 1949, 1),
+    ("The Shining", 1977, 4);
+    
+SELECT * FROM autor;
+SELECT * FROM ksiazka;
+
+DELETE FROM autor WHERE nazwisko = 'Orwell';
+SELECT * FROM zamowienia;
+SELECT * FROM uzytkownicy;
+
+SELECT * FROM zamowienia, uzytkownicy
+WHERE uzytkownicy_id = uzytkownicy.user_id;
+SELECT * FROM zamowienia
+LEFT JOIN uzytkownicy
+ON zamowienia.uzytkownicy_id = uzytkownicy.user_id;
+/* to jest to samo */
+SELECT 
+zamowienia.id,
+uzytkownicy.adres_ulica,
+uzytkownicy.adres_miasto,
+uzytkownicy.adres_kod
+FROM zamowienia
+LEFT JOIN uzytkownicy
+ON zamowienia.uzytkownicy_id = uzytkownicy.user_id;
+
+SELECT * FROM zamowienia
+JOIN uzytkownicy
+ON zamowienia.uzytkownicy_id = uzytkownicy.user_id
+WHERE uzytkownicy_id = 1;
+
+SELECT * FROM zamowienia, koszyk
+WHERE koszyk.zamowienia_id = zamowienia.id
+AND uzytkownicy_id = 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
