@@ -906,6 +906,7 @@ SELECT * FROM zamowienia
 LEFT JOIN uzytkownicy
 ON zamowienia.uzytkownicy_id = uzytkownicy.user_id;
 /* to jest to samo */
+
 SELECT 
 zamowienia.id,
 uzytkownicy.adres_ulica,
@@ -923,18 +924,58 @@ WHERE uzytkownicy_id = 1;
 SELECT * FROM zamowienia, koszyk
 WHERE koszyk.zamowienia_id = zamowienia.id
 AND uzytkownicy_id = 1;
+/* ====================================== ÆWICZENIA ==================================================*/
+USE ksiazki;
+SHOW tables;
+DESC ksiazki;
+DESC koszyk;
+/* Wylistuj numery zamówien i zamówione ksi¹¿ki (po³¹cz u¿ywaj¹c kostrukcji JOIN tabele: koszyk i ksi¹¿ki). */
+SELECT * FROM ksiazki, koszyk
+WHERE ksiazki.ksiazka_id = koszyk.ksiazki_id;
+
+/* ZnajdŸ numery zamówieñ, w których zakupiono ksi¹¿kê o Harrym Potterze. */
+SELECT * FROM koszyk JOIN ksiazki
+ON koszyk.ksiazki_id = ksiazki.ksiazka_id
+WHERE ksiazki.title LIKE "%Harry Potter%";
+
+/* Wypisz adresy email u¿ytkowników, którzy nie z³o¿yli jeszcze zamówienia w naszym sklepie aby wys³aæ im kupon promocyjny na pierwsze zakupy. */
+
+SELECT uzytkownicy.email FROM uzytkownicy LEFT JOIN zamowienia
+ON uzytkownicy.user_id = zamowienia.uzytkownicy_id
+WHERE zamowienia.uzytkownicy_id IS NULL;
 
 
+/* Wylistuj wszystkich u¿ytkowników z Warszawy i powi¹¿ ich z ich zamówieniami. */
+
+SELECT * FROM uzytkownicy
+LEFT JOIN zamowienia ON uzytkownicy.user_id = zamowienia.uzytkownicy_id
+WHERE uzytkownicy.adres_miasto = "Warszawa";
+
+SELECT * FROM zamowienia 
+RIGHT JOIN uzytkownicy ON uzytkownicy.user_id = zamowienia.uzytkownicy_id 
+WHERE uzytkownicy.adres_miasto LIKE "Warszawa";
+
+/* ======================= WIELOKROTNE £¥CZENIE TABEL ============== */
+SELECT * FROM zamowienia;
+SELECT * FROM uzytkownicy;
+SELECT * FROM koszyk;
+SELECT * FROM ksiazki;
 
 
+SELECT * FROM zamowienia
+JOIN koszyk
+ON koszyk.zamowienia_id = zamowienia.id
+JOIN ksiazki
+ON koszyk.ksiazki_id = ksiazki.ksiazka_id;
 
-
-
-
-
-
-
-
+SELECT
+	uzytkownicy.imie,
+    uzytkownicy.nazwisko,
+    ksiazki.title
+FROM uzytkownicy
+	JOIN zamowienia ON zamowienia.uzytkownicy_id = uzytkownicy.user_id
+    JOIN koszyk ON koszyk.zamowienia_id = zamowienia.id
+    JOIN ksiazki ON ksiazki.ksiazka_id = koszyk.ksiazki_id;
 
 
 
