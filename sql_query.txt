@@ -977,6 +977,130 @@ FROM uzytkownicy
     JOIN koszyk ON koszyk.zamowienia_id = zamowienia.id
     JOIN ksiazki ON ksiazki.ksiazka_id = koszyk.ksiazki_id;
 
+USE ksiazki;
+CREATE TABLE ksiazka
+(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tytul CHAR(20),
+    rok_wydania INT(4),
+    autor_id INT,
+    FOREIGN KEY(autor_id) 
+		REFERENCES autor(id)
+        ON DELETE CASCADE
+);
+CREATE TABLE magazyn
+(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    ksiazki_id INT,
+    stan_magazynowy INT,
+    hurtownia TINYINT,
+    data_aktualizacji TIMESTAMP DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP,
+	FOREIGN KEY (ksiazki_id)
+		REFERENCES ksiazki(ksiazka_id)
+);
+LOAD DATA INFILE 
+'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\magazyn.csv'
+INTO TABLE magazyn
+CHARACTER SET utf8
+FIELDS TERMINATED BY ';'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES
+(ksiazki_id, stan_magazynowy, hurtownia);
 
+SELECT * FROM magazyn;
+SELECT * FROM zamowienia;
+SELECT * FROM koszyk;
+SELECT * FROM ksiazki LIMIT 5;
 
+/* Stan magazynowy ksi¹¿ek które zosta³y zakupione choæ raz. */
+SELECT DISTINCT ksiazki.title, magazyn.stan_magazynowy FROM ksiazki
+JOIN koszyk ON koszyk.ksiazki_id = ksiazki.ksiazka_id
+JOIN magazyn ON magazyn.ksiazki_id = ksiazki.ksiazka_id
+WHERE koszyk.ksiazki_id != 0;
 
+SELECT 
+    DISTINCT title, 
+    magazyn.stan_magazynowy 
+FROM koszyk 
+JOIN ksiazki ON ksiazki.ksiazka_id = koszyk.ksiazki_id 
+    LEFT JOIN magazyn ON magazyn.ksiazki_id = ksiazki.ksiazka_id;
+
+/* Tytu³y ksi¹¿ek niedostêpnych ju¿ w hurtowni oraz ich stan magazynowy posortowane rosn¹co wed³ug iloœci sztuk na magazynie. */
+
+SELECT ksiazki.title, magazyn.stan_magazynowy FROM ksiazki
+JOIN magazyn ON magazyn.ksiazki_id = ksiazki.ksiazka_id
+WHERE magazyn.hurtownia = 0 
+ORDER BY magazyn.stan_magazynowy ASC;
+/* tutaj musi byc uzyty left join gdyz nie wyswietla sie ksizki o stanie magazynowym zero */
+SELECT 
+    title, 
+    magazyn.stan_magazynowy 
+FROM ksiazki 
+LEFT JOIN magazyn ON magazyn.ksiazki_id = ksiazki.ksiazka_id 
+WHERE magazyn.hurtownia = 0 ORDER BY 2;
+
+/* Ile jest ksi¹¿ek, które nigdy nie zosta³y zamówione */
+SELECT * FROM koszyk;
+
+SELECT COUNT(*) FROM ksiazki
+LEFT JOIN koszyk ON ksiazki.ksiazka_id = koszyk.ksiazki_id
+WHERE koszyk.ksiazki_id IS NULL;
+
+/* Spoœród ksi¹¿ek, które nigdy nie zosta³y zamówione, wymieñ 5 których mamy na magazynie najwiêcej. */
+SELECT ksiazki.title, magazyn.stan_magazynowy
+FROM ksiazki
+LEFT JOIN magazyn ON ksiazki.ksiazka_id = magazyn.ksiazki_id
+LEFT JOIN koszyk ON ksiazki.ksiazka_id = koszyk.ksiazki_id
+WHERE koszyk.ksiazki_id IS NULL 
+ORDER BY magazyn.stan_magazynowy DESC
+LIMIT 5;
+
+SELECT * FROM ksiazki
+LEFT JOIN magazyn ON magazyn.ksiazki_id = ksiazki.ksiazka_id
+    LEFT JOIN koszyk ON koszyk.ksiazki_id = ksiazki.ksiazka_id 
+    WHERE koszyk.ksiazki_id IS NULL
+ORDER BY magazyn.stan_magazynowy DESC
+LIMIT 5;
+
+/* Posortuj tytu³y sprzedanych ksi¹¿ek wed³ug iloœci sprzedanych egzemplarzy (malej¹co), 
+sprawdŸ czy pozycja jest dostêpna w hurtowni i wypisz stosown¹ informacjê (‘brak w hurtowni’ lub ‘dostêpny w hurtowni’). 
+TO JEST ZADANIE KTÓRE NA CHWILÊ OBECN¥ NIECO PRZERASTA MOJE MO¯LIWOŒCI, ROZWIAZANIE JEST JEDNAK BARDZO KROTKIE I BANALNE*/
+SELECT
+    ksiazki.title,
+    COUNT(*) AS sprzedanych,
+    CASE
+        WHEN magazyn.hurtownia = 0 THEN 'brak w hurtowni'
+        ELSE 'dostêpny w hurtowni'
+    END AS sprzedanych
+FROM koszyk
+LEFT JOIN ksiazki ON ksiazki.ksiazka_id = koszyk.ksiazki_id
+    LEFT JOIN magazyn ON ksiazki.ksiazka_id = magazyn.ksiazki_id
+GROUP BY koszyk.ksiazki_id
+ORDER BY 2 DESC;
+
+/* ========================= TRIGGERY ====================================== */
+SELECT * FROM koszyk;
+
+DELIMITER $$
+CREATE TRIGGER insert_order BEFORE INSERT ON koszyk
+FOR EACH ROW BEGIN
+	UPDATE magazyn SET stan_magazynowy = stan_magazynowy - 1
+		WHERE magazyn.ksiazki_id = NEW.ksiazki_id;
+END; $$
+DELIMITER ;
+
+INSERT INTO zamowienia(uzytkownicy_id)
+VALUES
+	(4),
+    (8);
+    
+INSERT INTO koszyk(zamowienia_id, ksiazki_id)
+VALUES
+	(12, 1),
+    (12, 3),
+    (13, 4);
+
+SELECT ksiazki_id, stan_magazynowy FROM magazyn; 
+
+SHOW TRIGGERS;
+DROP TRIGGER insert_order;
